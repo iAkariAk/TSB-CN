@@ -14,4 +14,5 @@
 
 ## 下载
 
-可从release中获得
+1. 可从release中获得正常发布的版本
+2. 亦可从action从获取最新的mapping合并
