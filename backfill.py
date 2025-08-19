@@ -15,21 +15,13 @@ import zipfile
 from amulet.api.data_types import ChunkCoordinates, Dimension
 from amulet_nbt import AnyNBT, NamedTag, ListTag, CompoundTag, StringTag
 
+from utils import fix_zip, preload_chunk_coords, is_unicode
+
 original_path = "./download/TheSkyBlessing.zip" if  not (p := os.getenv("TEST_TSB_PATH")) else p
 
 mapping = json.loads(Path("mapping.json").read_text())
 
 TEXT_PATTERN = re.compile(r'(\\\\"|")((?:[^"\\]|\\.)*)\1')
-
-
-def fix_zip(path: Path):
-    abspath = path.resolve()
-    tempzip_path = abspath.with_name("temp.zip")
-    subprocess.run([
-        "zip", "-FF", str(abspath), "--out", str(tempzip_path)
-    ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    tempzip_path.replace(abspath)
-    return path
 
 def handle_dp(map_dir):
     datapacks_dir = map_dir / "datapacks"
@@ -45,7 +37,7 @@ def handle_dp(map_dir):
                             content = file.read().decode('utf-8')
                             translated = content
                             for bounds, body in re.findall(TEXT_PATTERN, content):
-                                if any(ord(c) > 256 for c in body) and body in mapping:
+                                if is_unicode(body) and body in mapping:
                                     translated = translated.replace(f'{bounds}{body}{bounds}',
                                                                     f'{bounds}{mapping[body]}{bounds}')
                             content = translated
@@ -62,15 +54,6 @@ def handle_dp(map_dir):
                 temp_zip_path.unlink()
             raise e
 
-
-def preload_chunk_coords(load_world) -> dict[Dimension, list[ChunkCoordinates]]:
-    world = load_world()
-    try:
-        return {
-            dimension: list(world.all_chunk_coords(dimension)) for dimension in world.dimensions
-        }  # Preload
-    finally:
-        world.close()
 
 
 def translate_text_from_json(element):

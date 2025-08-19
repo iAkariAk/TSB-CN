@@ -1,4 +1,4 @@
-# The Sky Blessing —— 天空之祝 v1.0.2
+# The Sky Blessing —— 天空之祝 v1.0.4
 
 原始**TSB项目**参见 [TSB项目](https://github.com/ProjectTSB)
 
