@@ -16,6 +16,11 @@ def preload_chunk_coords(load_world) -> dict[Dimension, list[ChunkCoordinates]]:
 
 
 def fix_zip(path: Path):
+    """
+    Note: Fixing perhaps lead to the zip being broken
+    :param path:
+    :return:
+    """
     abspath = path.resolve()
     tempzip_path = abspath.with_name("temp.zip")
     subprocess.run([
